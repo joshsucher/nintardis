@@ -1,7 +1,10 @@
+
 import time
 import board
+import busio
 import bmp384
 import subprocess
+import threading
 import xml.etree.ElementTree as ET
 import os
 from collections import deque
@@ -17,6 +20,13 @@ first_reading = True  # Flag to ignore first reading
 PRESSURE_THRESHOLD = 0.25  # Minimum pressure difference to trigger alert
 last_trigger_time = None
 COOLDOWN_SECONDS = 10
+
+def launch_emulationstation():
+    #os.system('su - pi emulationstation')
+    os.system('sudo systemctl restart getty@tty1')
+    #os.system('su - pi nohup emulationstation &')
+    #os.system('su - pi bash /opt/retropie/configs/all/autostart.sh')
+    #os.system('nohup emulationstation &')
 
 def get_rolling_average():
     return sum(readings) / len(readings)
@@ -173,16 +183,19 @@ def handle_pressure_spike():
     play_video_overlay(next_system)
     
     # Now do all our system changes while video is playing
+    subprocess.run(['killall', 'retroarch'])
     subprocess.run(['killall', 'emulationstation'])
     toggle_system_folders()
     move_gb_to_top_of_systems()
     
     # Give the video a moment to play before restarting ES
-    time.sleep(2)
+    #time.sleep(2)
     
     # Restart EmulationStation as pi user
     print("Attempting to restart EmulationStation...")
-    os.system('su - pi -c "nohup emulationstation >/dev/null 2>&1 &"')
+    #os.system('su - pi -c "nohup emulationstation >/dev/null 2>&1 &"')
+    threading.Thread(target=launch_emulationstation).start()
+    #os.system('su - pi emulationstation')
     print("EmulationStation restart command sent")
     
     # Update cooldown timer
