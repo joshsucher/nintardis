@@ -1,0 +1,14 @@
+# Initialize system to NES
+if [ -d "/home/pi/RetroPie/roms/gb" ]; then
+    sudo mv /home/pi/RetroPie/roms/gb /home/pi/RetroPie/roms/gb_disabled
+fi
+
+if [ -d "/home/pi/RetroPie/roms/nes_disabled" ]; then
+    sudo mv /home/pi/RetroPie/roms/nes_disabled /home/pi/RetroPie/roms/nes
+fi
+
+# Update startup system
+sudo sed -i 's/value="gb"/value="nes"/g' /home/pi/.emulationstation/es_settings.cfg
+
+# Update theme overlay
+sudo sed -i 's/gb_overlay.png/nes_overlay.png/g' /etc/emulationstation/themes/es-theme-ssimple-ve/theme.xml
