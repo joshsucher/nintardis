@@ -175,6 +175,14 @@ def toggle_system_folders():
 
 def handle_pressure_spike():
     global last_trigger_time
+
+    # Wait for pressure to return to baseline before triggering
+    while True:
+        current = bmp.pressure
+        recent_avg = get_rolling_average()
+        if current - recent_avg < PRESSURE_THRESHOLD:
+            break
+        time.sleep(0.5)
     
     # Figure out which system we're switching to before we start
     next_system = determine_next_system()
